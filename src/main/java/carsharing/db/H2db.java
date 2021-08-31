@@ -60,7 +60,7 @@ public final class H2db {
         testConnectionAndCreateCompanyTable();
         createCarTable();
         createCustomerTable();
-        startIndexIDwith1();
+        //startIndexIDwith1();
     }
 
 
