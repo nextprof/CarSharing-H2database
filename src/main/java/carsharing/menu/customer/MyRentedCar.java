@@ -1,5 +1,6 @@
 package carsharing.menu.customer;
 
+import carsharing.db.H2db;
 import carsharing.entity.Car;
 import carsharing.entity.Customer;
 
@@ -13,6 +14,7 @@ public class MyRentedCar extends CustomerOption {
 
     @Override
     public void action() {
+        H2db h2db = H2db.getInstance("");
         Optional<Car> car = h2db.getCustomerCar(customer);
         car.ifPresentOrElse(value -> {
             System.out.println("Your rented car:");

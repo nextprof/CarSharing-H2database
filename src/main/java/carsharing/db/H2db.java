@@ -60,7 +60,7 @@ public final class H2db {
         testConnectionAndCreateCompanyTable();
         createCarTable();
         createCustomerTable();
-        test();
+        startIndexIDwith1();
     }
 
 
@@ -121,26 +121,24 @@ public final class H2db {
 
     public boolean areCustomersAvailable() {
         String sql = "SELECT * FROM CUSTOMER";
-        try(Connection conn = DriverManager.getConnection(URL);
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            conn.setAutoCommit(true);
-            ResultSet affectedRows = stmt.executeQuery();
-            if(affectedRows.next()) {
-                return true;
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return false;
+        return hasRecord(sql);
+    }
+
+    public int getCarId(Car car) {
+        String selectSQL = String.format("SELECT * FROM CAR WHERE NAME = '%s'",car.getName());
+        return getId(selectSQL);
     }
 
     private int getIdByCompanyName(String companyName) {
         String selectSQL = "SELECT * FROM COMPANY WHERE NAME = " + "'" + companyName + "'";
+        return getId(selectSQL);
+    }
+    public int getId(String query) {
         try (Connection con = DriverManager.getConnection(URL);
-             PreparedStatement preparedStatement = con.prepareStatement(selectSQL)) {
-            try (ResultSet companies = preparedStatement.executeQuery()) {
-                if(companies.next()) {
-                    return companies.getInt("ID");
+             PreparedStatement preparedStatement = con.prepareStatement(query)) {
+            try (ResultSet cars = preparedStatement.executeQuery()) {
+                if(cars.next()) {
+                    return cars.getInt("ID");
                 }
             }
         } catch (SQLException throwables) {
@@ -202,18 +200,7 @@ public final class H2db {
 
     public boolean areCompaniesAvailable() {
         String selectSQL = "SELECT * FROM COMPANY";
-        try (Connection con = DriverManager.getConnection(URL);
-             PreparedStatement preparedStatement = con.prepareStatement(selectSQL)) {
-            try (ResultSet companies = preparedStatement.executeQuery()) {
-                if(companies.next()) {
-                    return true;
-                }
-
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return false;
+        return hasRecord(selectSQL);
     }
 
     public boolean areCarsAvailable(String companyName) {
@@ -221,10 +208,14 @@ public final class H2db {
                 "WHERE COMPANY_ID=COM.ID and COM.NAME="
                 + "'"+companyName + "'";
 
+        return hasRecord(selectSQL);
+    }
+
+    public boolean hasRecord(String query) {
         try (Connection con = DriverManager.getConnection(URL);
-             PreparedStatement preparedStatement = con.prepareStatement(selectSQL)) {
-            try (ResultSet cars = preparedStatement.executeQuery()) {
-                if(cars.next()) {
+             PreparedStatement preparedStatement = con.prepareStatement(query)) {
+            try (ResultSet set = preparedStatement.executeQuery()) {
+                if(set.next()) {
                     return true;
                 }
             }
@@ -281,7 +272,6 @@ public final class H2db {
                     int companyId = cars.getInt("COMPANY_ID");
                     map.put(counter++,new Car(dbId,name,companyId));
                     flag = true;
-                    // System.out.println(counter++ + ". " + name);
                 }
                 if(flag){
                     System.out.println();
@@ -294,7 +284,7 @@ public final class H2db {
         return Optional.empty();
     }
 
-    public void test() {
+    public void startIndexIDwith1() {
         try(Connection conn = DriverManager.getConnection(URL);
             Statement stmt = conn.createStatement()) {
             conn.setAutoCommit(true);
@@ -308,43 +298,26 @@ public final class H2db {
     }
 
     public void setCustomerRentedCarId(Customer customer,int id) {
-        String selectSQL = String.format("UPDATE CUSTOMER SET RENTED_CAR_ID = %d WHERE NAME = '%s'",id,customer.getName());
+        String selectSQL = String.format("UPDATE CUSTOMER SET RENTED_CAR_ID = %d WHERE NAME = '%s'"
+                ,id,customer.getName());
 
-        try (Connection con = DriverManager.getConnection(URL);
-             PreparedStatement preparedStatement = con.prepareStatement(selectSQL)) {
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        executeStatement(selectSQL);
     }
 
     public void clearCustomerRentedCarId(Customer customer) {
-        String selectSQL = String.format("UPDATE CUSTOMER SET RENTED_CAR_ID = NULL WHERE NAME = '%s'",customer.getName());
+        String selectSQL = String.format("UPDATE CUSTOMER SET RENTED_CAR_ID = NULL WHERE NAME = '%s'"
+                ,customer.getName());
+        executeStatement(selectSQL);
+    }
 
+    public void executeStatement(String query) {
         try (Connection con = DriverManager.getConnection(URL);
-             PreparedStatement preparedStatement = con.prepareStatement(selectSQL)) {
+             PreparedStatement preparedStatement = con.prepareStatement(query)) {
             preparedStatement.executeUpdate();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
-    }
-
-    public int getCarId(Car car) {
-        String selectSQL = String.format("SELECT * FROM CAR WHERE NAME = '%s'",car.getName());
-        try (Connection con = DriverManager.getConnection(URL);
-             PreparedStatement preparedStatement = con.prepareStatement(selectSQL)) {
-            try (ResultSet cars = preparedStatement.executeQuery()) {
-                if(cars.next()) {
-                    return cars.getInt("ID");
-                }
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return 0;
     }
 
     public Optional<Map<Integer, Customer>> getAllCustomers() {

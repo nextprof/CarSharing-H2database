@@ -47,6 +47,7 @@ public class CustomerMenu implements Menu {
 
     public CustomerOption getCustomerMenuOptions(int choice, Customer customer) {
         switch (choice) {
+
             case 1:
                 return new RentCar(customer);
             case 2:

@@ -1,7 +1,6 @@
 package carsharing.menu;
 
 import carsharing.db.H2db;
-import carsharing.menu.Menu;
 
 import java.util.Scanner;
 

@@ -38,7 +38,7 @@ public class Car {
         this.id = id;
     }
 
-    public static  void printCars(Map<Integer,Car> map) {
+    public static void printCars(Map<Integer,Car> map) {
         map.forEach((k,v) -> System.out.format("%d. %s\n",k,v.getName()));
     }
 

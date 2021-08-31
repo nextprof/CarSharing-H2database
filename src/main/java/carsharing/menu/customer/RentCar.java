@@ -1,5 +1,6 @@
 package carsharing.menu.customer;
 
+import carsharing.db.H2db;
 import carsharing.entity.Car;
 import carsharing.entity.Customer;
 
@@ -16,6 +17,7 @@ public class RentCar extends CustomerOption {
 
     @Override
     public void action() {
+        H2db h2db = H2db.getInstance("");
         if(customer.getRentedCarId()!=0)
         {
             System.out.println("You've already rented a car!");
@@ -53,10 +55,6 @@ public class RentCar extends CustomerOption {
                 System.out.println("The company list is empty!");
             }
         }
-    }
-
-    public Customer getCustomer() {
-        return customer;
     }
 
 }
