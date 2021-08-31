@@ -1,0 +1,19 @@
+package carsharing.menu.manager;
+
+import carsharing.db.H2db;
+import carsharing.menu.Menu;
+
+import java.util.Scanner;
+
+public class CreateCompany implements Menu {
+    @Override
+    public void show() {
+        System.out.println("Enter the company name:");
+        Scanner scn = new Scanner(System.in);
+
+        String companyName = scn.nextLine();
+        H2db h2db = H2db.getInstance("");
+        h2db.saveCompany(companyName);
+
+    }
+}
